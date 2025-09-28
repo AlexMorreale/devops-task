@@ -12,6 +12,9 @@ This file is for tracking changes, decisions, and important notes about the proj
 ### Kubernetes Deployment
 - I'm going to use Helm to create deployment manifests 
 - Run `helm create helloapp-chart`
-- 
-
-
+- Update the image to use our helloapp image. Since this is local we can just reference the image name.
+- Deploy our latest image tag
+- Update securityContext protect against root escalation and run pod as non-root user
+- Update service to map to port the Docker container is leveraging
+- Set some basic requests and then set double the request as the limit before testing performance
+- Use port name to map so we don't have to worry about things mapping 
