@@ -18,3 +18,9 @@ This file is for tracking changes, decisions, and important notes about the proj
 - Update service to map to port the Docker container is leveraging
 - Set some basic requests and then set double the request as the limit before testing performance
 - Use port name to map so we don't have to worry about things mapping 
+
+### CI/CD
+- I'm going to leverage GitHub Actions for this, it's a common pattern and free to use on public repos
+- I want to run our tests in the docker container to make sure we are testing in our production environment, which could surface things like permissions, user, or runtime problems.
+- I could just dump all the files into the container but I'd prefer to not have our tests in our production environment so I'll have to modify the Docker image to support this with a multi-stage build.
+
