@@ -19,10 +19,15 @@ This file is for tracking changes, decisions, and important notes about the proj
 - Set some basic requests and then set double the request as the limit before testing performance
 - Use port name to map so we don't have to worry about things mapping 
 
-### CI/CD
+### CI
 - I'm going to leverage GitHub Actions for this, it's a common pattern and free to use on public repos
 - I want to run our tests in the docker container to make sure we are testing in our production environment, which could surface things like permissions, user, or runtime problems.
 - I could just dump all the files into the container but I'd prefer to not have our tests in our production environment so I'll have to modify the Docker image to support this with a multi-stage build.
 - Merged my changes into main so that i could test the ci/cd workflow
 - This repo is quite old that we cloned from so we have to support master and main for branches
 - I want to publish the image so that in theory we could pull it at this point
+
+### CD
+- An easy way to only trigger CD on deploy is break these workflows into two files and setting different conditions for each
+
+
