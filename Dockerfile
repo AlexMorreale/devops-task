@@ -14,8 +14,7 @@ FROM base as test
 # Copy all files including tests
 COPY . .
 
-# Run tests
-RUN python -m unittest helloapp.test -v
+# Don't run tests during build - we'll run them separately
 
 # Stage 3: Production stage - clean image without tests
 FROM base as production
