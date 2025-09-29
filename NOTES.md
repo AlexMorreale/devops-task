@@ -28,6 +28,8 @@ This file is for tracking changes, decisions, and important notes about the proj
 - I want to publish the image so that in theory we could pull it at this point
 
 ### CD
-- An easy way to only trigger CD on deploy is break these workflows into two files and setting different conditions for each
-
-
+- An easy way to only trigger CD on deploy is to break these workflows into two files and set different conditions for each
+- Add basic deploy step to setup context
+- Leverage OSS azure/helm action to setup and configure helm for us, easier than installing and setting up PATH
+- I'm going to override the values.yaml with the CLI in Actions. While I might want a production or staging values file in the future, for now this is fine for this simple exercise.
+- Tried leveraging KIND to do a "test deploy" but it was getting overly complicated so I just nixed it

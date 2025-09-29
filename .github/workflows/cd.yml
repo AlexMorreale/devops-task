@@ -1,8 +1,11 @@
 name: CD Pipeline
 
 on:
-  push:
-    branches: [ master ]
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches: [ main, master ]
 
 env:
   IMAGE_NAME: helloapp
@@ -12,6 +15,7 @@ jobs:
   publish:
     name: Push to Registry
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     - name: Checkout code
@@ -47,3 +51,51 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: publish
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: '3.12.0'
+
+    - name: Configure kubectl for production cluster
+      run: |
+        echo "Setting up kubectl context for production cluster"
+        echo "Attempting to configure kubeconfig from secrets..."
+
+        if [ -n "${{ secrets.KUBE_CONFIG_DATA }}" ]; then
+          echo "KUBE_CONFIG_DATA secret found, configuring kubectl..."
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > ~/.kube/config
+          kubectl cluster-info
+        else
+          echo "KUBE_CONFIG_DATA secret not configured (expected for demo)"
+        fi
+
+    - name: Simulate production deployment
+      run: |
+        # Simulate deployment to production cluster using Helm with CLI overrides
+        IMAGE_TAG="master-${{ github.sha }}"
+        IMAGE_REPO="${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}"
+
+        echo "Would deploy image: ${IMAGE_REPO}:${IMAGE_TAG}"
+        echo "Production deployment command would be:"
+        echo ""
+        echo "helm upgrade --install helloapp ./helloapp-chart \\"
+        echo "  --create-namespace \\"
+        echo "  --namespace production \\"
+        echo "  --wait --timeout=300s \\"
+        echo "  --atomic \\"
+        echo "  --set image.repository=\"${IMAGE_REPO}\" \\"
+        echo "  --set image.tag=\"${IMAGE_TAG}\" \\"
+        echo "  --set image.pullPolicy=\"Always\""
+        echo ""
+        echo "Production deployment simulation completed"
